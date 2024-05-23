@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Colorizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/hyphen@1.10.4/patterns/de-1996.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hyphen@1.10.4/hyphen.min.js"></script>
     <style>
-        #output {
-            white-space: pre-wrap;
-        }
-
         .color1 {
             color: red;
         }
@@ -35,21 +32,32 @@
 <button onclick="copyText()">Copy Text</button>
 
 <script>
-    function colorizeText() {
+    const hyphenate = createHyphenator(hyphenationPatternsDe1996, {
+        async: true,
+        hyphenChar: "-"
+    });
+
+    async function colorizeText() {
         const text = document.getElementById('inputText').value;
         const color1 = document.getElementById('color1').value;
         const color2 = document.getElementById('color2').value;
 
-        let parts = text.split('-');
+        let words = text.split(" ");
         let result = '';
         let toggle = true;
 
-        for (let i = 0; i < parts.length; i++) {
-            if (i > 0) {
-                result += `<span style="color: ${toggle ? color1 : color2}">-</span>`;
+        for (const word of words) {
+            const hypens = await hyphenate(word)
+            const splitHypens = hypens.split("-")
+            const splitHypensLen = splitHypens.length
+
+            for (let i = 0; i < splitHypens.length - 1; i++) {
+                result += `<span style="color: ${toggle ? color1 : color2}">${splitHypens[i]}</span>`;
                 toggle = !toggle;
             }
-            result += `<span style="color: ${toggle ? color1 : color2}">${parts[i]}</span>`;
+
+            result += `<span style="color: ${toggle ? color1 : color2}">${splitHypens[splitHypensLen - 1]} </span>`;
+            toggle = !toggle;
         }
 
         document.getElementById('output').innerHTML = result;
@@ -63,7 +71,6 @@
         window.getSelection().addRange(range);
         document.execCommand('copy');
         window.getSelection().removeAllRanges();
-        alert('Text copied to clipboard!');
     }
 </script>
 </body>
