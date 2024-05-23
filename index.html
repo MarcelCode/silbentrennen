@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Colorizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/hyphen@1.10.4/hyphen.min.js"></script>
+    <style>
+        #output {
+            white-space: pre-wrap;
+        }
+
+        .color1 {
+            color: red;
+        }
+
+        .color2 {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+<h1>Text Colorizer</h1>
+<label for="color1">Color 1: </label>
+<input type="color" id="color1" value="#FF0000"><br><br>
+<label for="color2">Color 2: </label>
+<input type="color" id="color2" value="#0000FF"><br><br>
+
+<textarea id="inputText" rows="10" cols="50" placeholder="Enter your text here..."></textarea><br><br>
+<button onclick="colorizeText()">Submit</button>
+<br><br>
+
+<div id="output"></div>
+<br><br>
+<button onclick="copyText()">Copy Text</button>
+
+<script>
+    function colorizeText() {
+        const text = document.getElementById('inputText').value;
+        const color1 = document.getElementById('color1').value;
+        const color2 = document.getElementById('color2').value;
+
+        let parts = text.split('-');
+        let result = '';
+        let toggle = true;
+
+        for (let i = 0; i < parts.length; i++) {
+            if (i > 0) {
+                result += `<span style="color: ${toggle ? color1 : color2}">-</span>`;
+                toggle = !toggle;
+            }
+            result += `<span style="color: ${toggle ? color1 : color2}">${parts[i]}</span>`;
+        }
+
+        document.getElementById('output').innerHTML = result;
+    }
+
+    function copyText() {
+        const outputDiv = document.getElementById('output');
+        const range = document.createRange();
+        range.selectNode(outputDiv);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        alert('Text copied to clipboard!');
+    }
+</script>
+</body>
+</html>
